@@ -1,4 +1,4 @@
-import { Triangle } from './models';
+import { Cube } from './models';
 
 export default class Game {
   constructor(canvas) {
@@ -9,7 +9,7 @@ export default class Game {
   }
   init() {
     const { gl } = this;
-    const triangle = new Triangle(gl);
+    const triangle = new Cube(gl);
     this.addModel(triangle);
 
     this.createProgram();

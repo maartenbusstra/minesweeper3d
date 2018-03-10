@@ -4,7 +4,7 @@ import Model from '../Model';
 import vertShaderSrc from '!raw-loader!./vertexShader.glsl';
 import fragShaderSrc from '!raw-loader!./fragmentShader.glsl';
 
-export default class Triangle extends Model {
+export default class Cube extends Model {
   constructor(...args) {
     super(...args);
     this.angle = 0;
