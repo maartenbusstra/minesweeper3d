@@ -13,11 +13,71 @@ export default class Triangle extends Model {
   }
 
   vertices = [
-  //  x     y     z      r    g    b
-     0.0,  0.5,  0.0,   1.0, 0.0, 0.0,
-    -0.5, -0.5,  0.0,   0.0, 1.0, 0.0,
-     0.5, -0.5,  0.0,   0.0, 0.0, 1.0,
-  ];
+    // X, Y, Z           R, G, B
+
+    // Top
+		-1.0, 1.0, -1.0,   0.5, 0.5, 0.5,
+		-1.0, 1.0, 1.0,    0.5, 0.5, 0.5,
+		1.0, 1.0, 1.0,     0.5, 0.5, 0.5,
+		1.0, 1.0, -1.0,    0.5, 0.5, 0.5,
+
+		// Left
+		-1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
+		-1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
+		-1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
+		-1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+
+		// Right
+		1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
+		1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
+		1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
+		1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+
+		// Front
+		1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+		1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
+		-1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
+		-1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+
+		// Back
+		1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+		1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
+		-1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
+		-1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+
+		// Bottom
+		-1.0, -1.0, -1.0,   0.5, 0.5, 1.0,
+		-1.0, -1.0, 1.0,    0.5, 0.5, 1.0,
+		1.0, -1.0, 1.0,     0.5, 0.5, 1.0,
+		1.0, -1.0, -1.0,    0.5, 0.5, 1.0,
+	];
+
+  indices = [
+		// Top
+		0, 1, 2,
+		0, 2, 3,
+
+		// Left
+		5, 4, 6,
+		6, 4, 7,
+
+		// Right
+		8, 9, 10,
+		8, 10, 11,
+
+		// Front
+		13, 12, 14,
+		15, 14, 12,
+
+		// Back
+		16, 17, 18,
+		16, 18, 19,
+
+		// Bottom
+		21, 20, 22,
+		22, 20, 23
+	];
+
 
   get shaders() {
     return [this.vertShader, this.fragShader];
@@ -32,8 +92,13 @@ export default class Triangle extends Model {
   prepare() {
     const { gl } = this;
     this.vertexBuffer = gl.createBuffer();
+    this.indexBuffer = gl.createBuffer();
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
 
     const vertPositionLocation = gl.getAttribLocation(this.program, 'vertPosition');
     gl.vertexAttribPointer(
@@ -80,6 +145,6 @@ export default class Triangle extends Model {
     this.angle = performance.now() / 1000 / 2 * 2 * Math.PI;
     mat4.rotate(this.worldMatrix, this.identityMatrix, this.angle, [0, 1, 0]);
     gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
   }
 }
