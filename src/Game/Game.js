@@ -4,7 +4,6 @@ export default class Game {
   constructor(canvas) {
     this.gl = canvas.getContext('webgl');
     window.gl = this.gl;
-    this.shaders = [];
     this.models = [];
     this.init();
   }
@@ -19,9 +18,19 @@ export default class Game {
 
   addModel(model) {
     this.models.push(model);
-    for (let i = 0; i < model.shaders.length; i++) {
-      this.shaders.push(model.shaders[i]);
+  }
+
+  get shaders() {
+    const { models } = this;
+    const _shaders = [];
+
+    for (let i = 0; i < models.length; i++) {
+      for (let j = 0, shaders = models[i].shaders; j < shaders.length; j++) {
+        _shaders.push(shaders[j]);
+      }
     }
+
+    return _shaders;
   }
 
   draw() {
@@ -31,17 +40,21 @@ export default class Game {
     }
   }
 
-  createProgram(shaders) {
-    const { gl } = this;
+  createProgram() {
+    const { gl, shaders, models } = this;
     const program = gl.createProgram();
-    for (let i = 0; i < this.shaders.length; i++) {
-      gl.attachShader(program, this.shaders[i]);
+
+    for (let i = 0; i < shaders.length; i++) {
+      gl.attachShader(program, shaders[i]);
     }
+
     gl.linkProgram(program);
     gl.useProgram(program);
-    for (let i = 0; i < this.models.length; i++) {
-      this.models[i].attachProgram(program);
+
+    for (let i = 0; i < models.length; i++) {
+      models[i].attachProgram(program);
     }
+
     return program;
   }
 }
