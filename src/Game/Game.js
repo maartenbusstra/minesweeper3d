@@ -9,6 +9,10 @@ export default class Game {
   }
   init() {
     const { gl } = this;
+    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.CULL_FACE);
+    gl.frontFace(gl.CCW);
+    gl.cullFace(gl.BACK);
     const triangle = new Cube(gl);
     this.addModel(triangle);
 
