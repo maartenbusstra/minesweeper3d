@@ -1,14 +1,22 @@
 /* eslint import/no-webpack-loader-syntax: off */
+import { mat4, glMatrix } from 'gl-matrix';
 import Model from '../Model';
 import vertShaderSrc from '!raw-loader!./vertexShader.glsl';
 import fragShaderSrc from '!raw-loader!./fragmentShader.glsl';
 
 export default class Triangle extends Model {
+  constructor(...args) {
+    super(...args);
+    this.angle = 0;
+    this.identityMatrix = new Float32Array(16);
+    mat4.identity(this.identityMatrix);
+  }
+
   vertices = [
-  //  x     y      r    g    b
-     0.0,  0.5,   1.0, 0.0, 0.0,
-    -0.5, -0.5,   0.0, 1.0, 0.0,
-     0.5, -0.5,   0.0, 0.0, 1.0,
+  //  x     y     z      r    g    b
+     0.0,  0.5,  0.0,   1.0, 0.0, 0.0,
+    -0.5, -0.5,  0.0,   0.0, 1.0, 0.0,
+     0.5, -0.5,  0.0,   0.0, 0.0, 1.0,
   ];
 
   get shaders() {
@@ -30,10 +38,10 @@ export default class Triangle extends Model {
     const vertPositionLocation = gl.getAttribLocation(this.program, 'vertPosition');
     gl.vertexAttribPointer(
       vertPositionLocation,
-      2,
+      3,
       gl.FLOAT,
       gl.FALSE,
-      5 * Float32Array.BYTES_PER_ELEMENT,
+      6 * Float32Array.BYTES_PER_ELEMENT,
       0,
     );
 
@@ -43,16 +51,35 @@ export default class Triangle extends Model {
       3,
       gl.FLOAT,
       gl.FALSE,
-      5 * Float32Array.BYTES_PER_ELEMENT,
-      2 * Float32Array.BYTES_PER_ELEMENT,
+      6 * Float32Array.BYTES_PER_ELEMENT,
+      3 * Float32Array.BYTES_PER_ELEMENT,
     )
 
     gl.enableVertexAttribArray(vertPositionLocation);
     gl.enableVertexAttribArray(vertColorLocation);
+
+    this.mWorldLocation = gl.getUniformLocation(this.program, 'mWorld');
+    const mViewLocation = gl.getUniformLocation(this.program, 'mView');
+    const mProjLocation = gl.getUniformLocation(this.program, 'mProj');
+
+    this.worldMatrix = new Float32Array(16);
+    const viewMatrix = new Float32Array(16);
+    const projMatrix = new Float32Array(16);
+
+    mat4.identity(this.worldMatrix);
+    mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
+    mat4.perspective(projMatrix, glMatrix.toRadian(45), gl.canvas.width / gl.canvas.height, 0.1, 1000.0);
+
+    gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
+    gl.uniformMatrix4fv(mViewLocation, gl.FALSE, viewMatrix);
+    gl.uniformMatrix4fv(mProjLocation, gl.FALSE, projMatrix);
   }
 
   draw() {
     const { gl } = this;
+    this.angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+    mat4.rotate(this.worldMatrix, this.identityMatrix, this.angle, [0, 1, 0]);
+    gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 }

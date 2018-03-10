@@ -13,7 +13,17 @@ export default class Game {
     this.addModel(triangle);
 
     this.createProgram();
-    this.draw();
+    this.start();
+  }
+
+  start() {
+    const loop = () => {
+      for (let i = 0; i < this.models.length; i++) {
+        this.models[i].draw();
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
   }
 
   addModel(model) {
@@ -31,13 +41,6 @@ export default class Game {
     }
 
     return _shaders;
-  }
-
-  draw() {
-    const { models } = this;
-    for (let i = 0; i < models.length; i++) {
-      models[i].draw();
-    }
   }
 
   createProgram() {
