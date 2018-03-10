@@ -128,10 +128,13 @@ export default class Cube extends Model {
     const mProjLocation = gl.getUniformLocation(this.program, 'mProj');
 
     this.worldMatrix = new Float32Array(16);
+    this.xRotationMatrix = new Float32Array(16);
+    this.yRotationMatrix = new Float32Array(16);
     const viewMatrix = new Float32Array(16);
     const projMatrix = new Float32Array(16);
 
-    mat4.identity(this.worldMatrix);
+    mat4.identity(this.xRotationMatrix);
+    mat4.identity(this.yRotationMatrix);
     mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
     mat4.perspective(projMatrix, glMatrix.toRadian(45), gl.canvas.width / gl.canvas.height, 0.1, 1000.0);
 
@@ -142,8 +145,12 @@ export default class Cube extends Model {
 
   draw() {
     const { gl } = this;
-    this.angle = performance.now() / 1000 / 2 * 2 * Math.PI;
-    mat4.rotate(this.worldMatrix, this.identityMatrix, this.angle, [0, 1, 0]);
+    this.angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+
+    mat4.rotate(this.xRotationMatrix, this.identityMatrix, this.angle, [1, 0, 0]);
+    mat4.rotate(this.yRotationMatrix, this.identityMatrix, this.angle, [0, 1, 0]);
+    mat4.multiply(this.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
+
     gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
   }
