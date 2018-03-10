@@ -10,16 +10,6 @@ export default class Triangle extends Model {
     -0.5, -0.5,   0.0, 1.0, 0.0,
      0.5, -0.5,   0.0, 0.0, 1.0,
   ];
-  constructor(gl, program) {
-    super(gl, program);
-    this.gl = gl;
-    this.program = program;
-    this.init();
-  }
-
-  init() {
-    this.createShaders();
-  }
 
   get shaders() {
     return [this.vertShader, this.fragShader];

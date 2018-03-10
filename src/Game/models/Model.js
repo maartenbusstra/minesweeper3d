@@ -1,4 +1,9 @@
 export default class Model {
+  constructor(gl, program) {
+    this.gl = gl;
+    this.createShaders();
+  }
+
   attachProgram(program) {
     this.program = program;
     this.prepare();
