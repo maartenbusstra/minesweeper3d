@@ -77,7 +77,7 @@ export default class Triangle extends Model {
 
   draw() {
     const { gl } = this;
-    this.angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+    this.angle = performance.now() / 1000 / 2 * 2 * Math.PI;
     mat4.rotate(this.worldMatrix, this.identityMatrix, this.angle, [0, 1, 0]);
     gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
