@@ -7,7 +7,6 @@ import fragShaderSrc from '!raw-loader!./fragmentShader.glsl';
 export default class Cube extends Model {
   constructor(...args) {
     super(...args);
-    this.angle = 0;
     this.identityMatrix = new Float32Array(16);
     mat4.identity(this.identityMatrix);
   }
@@ -124,34 +123,48 @@ export default class Cube extends Model {
     gl.enableVertexAttribArray(vertColorLocation);
 
     this.mWorldLocation = gl.getUniformLocation(this.program, 'mWorld');
-    const mViewLocation = gl.getUniformLocation(this.program, 'mView');
+    this.mViewLocation = gl.getUniformLocation(this.program, 'mView');
     const mProjLocation = gl.getUniformLocation(this.program, 'mProj');
 
     this.worldMatrix = new Float32Array(16);
     this.xRotationMatrix = new Float32Array(16);
     this.yRotationMatrix = new Float32Array(16);
-    const viewMatrix = new Float32Array(16);
+    this.viewMatrix = new Float32Array(16);
     const projMatrix = new Float32Array(16);
 
     mat4.identity(this.xRotationMatrix);
     mat4.identity(this.yRotationMatrix);
-    mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
-    mat4.perspective(projMatrix, glMatrix.toRadian(45), gl.canvas.width / gl.canvas.height, 0.1, 1000.0);
+    mat4.identity(this.worldMatrix);
+    mat4.perspective(
+      projMatrix,
+      glMatrix.toRadian(45),
+      gl.canvas.width / gl.canvas.height,
+      0.1,
+      1000.0,
+    );
 
     gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
-    gl.uniformMatrix4fv(mViewLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(mProjLocation, gl.FALSE, projMatrix);
   }
 
   draw() {
     const { gl } = this;
-    this.angle = performance.now() / 1000 / 6 * 2 * Math.PI;
+    const now = performance.now() / 1000;
+    const camX = Math.sin(now / 2 * Math.PI) * 10;
+    const camZ = Math.cos(now / 2 * Math.PI) * 3;
 
-    mat4.rotate(this.xRotationMatrix, this.identityMatrix, this.angle, [1, 0, 0]);
-    mat4.rotate(this.yRotationMatrix, this.identityMatrix, this.angle, [0, 1, 0]);
-    mat4.multiply(this.worldMatrix, this.yRotationMatrix, this.xRotationMatrix);
+    mat4.lookAt(
+      this.viewMatrix,
+      [
+        camX,
+        (Math.sin(now / 4 * Math.PI) + 1) * 2,
+        camZ,
+      ],
+      [0, 0, 0],
+      [0, 1, 0],
+    );
 
-    gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
+    gl.uniformMatrix4fv(this.mViewLocation, gl.FALSE, this.viewMatrix);
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
   }
 }
