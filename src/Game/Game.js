@@ -1,4 +1,4 @@
-import { Cube } from './models';
+import { Monkey } from './models';
 
 export default class Game {
   constructor(canvas) {
@@ -14,7 +14,7 @@ export default class Game {
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
 
-    this.addModel(new Cube(gl));
+    this.addModel(new Monkey(gl));
 
     this.start();
   }
