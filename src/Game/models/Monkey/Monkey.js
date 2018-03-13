@@ -29,6 +29,7 @@ export default class Monkey extends Model {
     this.vertices = [].concat.apply([], mesh.vertices);
     this.indices = [].concat.apply([], mesh.faces);
     this.texCoords = mesh.texturecoords[0];
+    this.normals = mesh.normals;
 
     this.createBuffers();
     this.createTextures();
@@ -49,6 +50,7 @@ export default class Monkey extends Model {
     this.vertexBuffer = gl.createBuffer();
     this.indexBuffer = gl.createBuffer();
     this.texCoordBuffer = gl.createBuffer();
+    this.normalBuffer = gl.createBuffer();
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
@@ -83,6 +85,20 @@ export default class Monkey extends Model {
       0,
     );
     gl.enableVertexAttribArray(vertTexCoordLocation);
+
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.normals), gl.STATIC_DRAW);
+    const vertNormalLocation = gl.getAttribLocation(this.program, 'vertNormal');
+    gl.vertexAttribPointer(
+      vertNormalLocation,
+      3,
+      gl.FLOAT,
+      gl.TRUE,
+      3 * Float32Array.BYTES_PER_ELEMENT,
+      0,
+    );
+    gl.enableVertexAttribArray(vertNormalLocation);
   }
 
   createTextures() {
@@ -117,6 +133,8 @@ export default class Monkey extends Model {
       [0, 0, 0],
       [0, 0, 1],
     );
+
+    // mat4.rotate(this.worldMatrix, this.identityMatrix, glMatrix.toRadian(45), 1.0);
 
     gl.useProgram(this.program);
     gl.bindTexture(gl.TEXTURE_2D, this.boxTexture);
