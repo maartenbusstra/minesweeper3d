@@ -151,15 +151,12 @@ export default class Cube extends Model {
     const { gl } = this;
     const now = performance.now() / 1000;
     const camX = Math.sin(now / 2 * Math.PI) * 10;
+    const camY = (Math.sin(now / 4 * Math.PI) + 1) * 2;
     const camZ = Math.cos(now / 2 * Math.PI) * 3;
 
     mat4.lookAt(
       this.viewMatrix,
-      [
-        camX,
-        (Math.sin(now / 4 * Math.PI) + 1) * 2,
-        camZ,
-      ],
+      [camX, camY, camZ],
       [0, 0, 0],
       [0, 1, 0],
     );
