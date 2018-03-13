@@ -15,10 +15,10 @@ export default class Cube extends Model {
     // X, Y, Z           R, G, B
 
     // Top
-    -1.0, 1.0, -1.0,   0.5, 0.5, 0.5,
-    -1.0, 1.0, 1.0,    0.5, 0.5, 0.5,
-    1.0, 1.0, 1.0,     0.5, 0.5, 0.5,
-    1.0, 1.0, -1.0,    0.5, 0.5, 0.5,
+    -1.0, 1.0, -1.0,   0.2, 0.2, 0.2,
+    -1.0, 1.0, 1.0,    0.2, 0.2, 0.2,
+    1.0, 1.0, 1.0,     0.2, 0.2, 0.2,
+    1.0, 1.0, -1.0,    0.2, 0.2, 0.2,
 
     // Left
     -1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
@@ -117,7 +117,7 @@ export default class Cube extends Model {
       gl.FALSE,
       6 * Float32Array.BYTES_PER_ELEMENT,
       3 * Float32Array.BYTES_PER_ELEMENT,
-    )
+    );
 
     gl.enableVertexAttribArray(vertPositionLocation);
     gl.enableVertexAttribArray(vertColorLocation);
