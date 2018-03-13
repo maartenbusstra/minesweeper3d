@@ -1,6 +1,8 @@
 export default class Model {
-  constructor(gl) {
+  constructor(gl, { model, texture }) {
     this.gl = gl;
+    this.model = model;
+    this.texture = texture;
     this.createShaders();
     this.createProgram();
     this.init();
