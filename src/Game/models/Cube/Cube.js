@@ -12,43 +12,44 @@ export default class Cube extends Model {
   }
 
   vertices = [
-    // X, Y, Z           R, G, B
+    // X, Y, Z          U, V
 
     // Top
-    -1.0, 1.0, -1.0,   0.2, 0.2, 0.2,
-    -1.0, 1.0, 1.0,    0.2, 0.2, 0.2,
-    1.0, 1.0, 1.0,     0.2, 0.2, 0.2,
-    1.0, 1.0, -1.0,    0.2, 0.2, 0.2,
+    -1.0, 1.0, -1.0,    0, 0,
+    -1.0, 1.0,  1.0,    0, 1,
+     1.0, 1.0,  1.0,    1, 1,
+     1.0, 1.0, -1.0,    1, 0,
 
     // Left
-    -1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
-    -1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
-    -1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
-    -1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+    -1.0,  1.0,  1.0,   1, 1,
+    -1.0, -1.0,  1.0,   0, 1,
+    -1.0, -1.0, -1.0,   0, 0,
+    -1.0,  1.0, -1.0,   1, 0,
 
     // Right
-    1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
-    1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
-    1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
-    1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+    1.0,  1.0,  1.0,    1, 1,
+    1.0, -1.0,  1.0,    0, 1,
+    1.0, -1.0, -1.0,    0, 0,
+    1.0,  1.0, -1.0,    1, 0,
 
     // Front
-    1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-    1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-    -1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-    -1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+     1.0,  1.0, 1.0,    1, 1,
+     1.0, -1.0, 1.0,    1, 0,
+    -1.0, -1.0, 1.0,    0, 0,
+    -1.0,  1.0, 1.0,    0, 1,
 
     // Back
-    1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-    1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-    -1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-    -1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+     1.0,  1.0, -1.0,   0, 0,
+     1.0, -1.0, -1.0,   0, 1,
+    -1.0, -1.0, -1.0,   1, 1,
+    -1.0,  1.0, -1.0,   1, 0,
 
     // Bottom
-    -1.0, -1.0, -1.0,   0.5, 0.5, 1.0,
-    -1.0, -1.0, 1.0,    0.5, 0.5, 1.0,
-    1.0, -1.0, 1.0,     0.5, 0.5, 1.0,
-    1.0, -1.0, -1.0,    0.5, 0.5, 1.0,
+    -1.0, -1.0, -1.0,   1, 1,
+    -1.0, -1.0,  1.0,   1, 0,
+     1.0, -1.0,  1.0,   0, 0,
+     1.0, -1.0, -1.0,   0, 1,
+
   ];
 
   indices = [
@@ -105,22 +106,31 @@ export default class Cube extends Model {
       3,
       gl.FLOAT,
       gl.FALSE,
-      6 * Float32Array.BYTES_PER_ELEMENT,
+      5 * Float32Array.BYTES_PER_ELEMENT,
       0,
     );
 
-    const vertColorLocation = gl.getAttribLocation(this.program, 'vertColor');
+    const vertTexCoordLocation = gl.getAttribLocation(this.program, 'vertTexCoord');
     gl.vertexAttribPointer(
-      vertColorLocation,
-      3,
+      vertTexCoordLocation,
+      2,
       gl.FLOAT,
       gl.FALSE,
-      6 * Float32Array.BYTES_PER_ELEMENT,
+      5 * Float32Array.BYTES_PER_ELEMENT,
       3 * Float32Array.BYTES_PER_ELEMENT,
     );
 
     gl.enableVertexAttribArray(vertPositionLocation);
-    gl.enableVertexAttribArray(vertColorLocation);
+    gl.enableVertexAttribArray(vertTexCoordLocation);
+
+    this.boxTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, this.boxTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, document.getElementById('crate'))
+    gl.bindTexture(gl.TEXTURE_2D, null);
 
     this.mWorldLocation = gl.getUniformLocation(this.program, 'mWorld');
     this.mViewLocation = gl.getUniformLocation(this.program, 'mView');
@@ -160,6 +170,9 @@ export default class Cube extends Model {
       [0, 0, 0],
       [0, 1, 0],
     );
+
+    gl.bindTexture(gl.TEXTURE_2D, this.boxTexture);
+    gl.activeTexture(gl.TEXTURE0);
 
     gl.uniformMatrix4fv(this.mViewLocation, gl.FALSE, this.viewMatrix);
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
