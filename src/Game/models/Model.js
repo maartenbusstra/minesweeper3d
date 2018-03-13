@@ -1,12 +1,9 @@
 export default class Model {
-  constructor(gl, program) {
+  constructor(gl) {
     this.gl = gl;
     this.createShaders();
-  }
-
-  attachProgram(program) {
-    this.program = program;
-    this.prepare();
+    this.createProgram();
+    this.init();
   }
 
   createShader(type, src) {
@@ -19,5 +16,19 @@ export default class Model {
       console.error(`ERROR compiling shader`, gl.getShaderInfoLog(shader));
     }
     return shader;
+  }
+
+  createProgram() {
+    const { gl, shaders } = this;
+    this.program = gl.createProgram();
+
+    for (let i = 0; i < shaders.length; i++) {
+      gl.attachShader(this.program, shaders[i]);
+    }
+
+    gl.linkProgram(this.program);
+    if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+      console.error(`Could not compile WebGL program. \n\n ${gl.getProgramInfoLog(this.program)}`);
+    }
   }
 }

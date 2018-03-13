@@ -5,13 +5,7 @@ import vertShaderSrc from '!raw-loader!./vertexShader.glsl';
 import fragShaderSrc from '!raw-loader!./fragmentShader.glsl';
 
 export default class Cube extends Model {
-  constructor(...args) {
-    super(...args);
-    this.identityMatrix = new Float32Array(16);
-    mat4.identity(this.identityMatrix);
-  }
-
-  vertices = [
+  static vertices = [
     // X, Y, Z          U, V
 
     // Top
@@ -51,8 +45,7 @@ export default class Cube extends Model {
      1.0, -1.0, -1.0,   0, 1,
 
   ];
-
-  indices = [
+  static indices = [
     // Top
     0, 1, 2,
     0, 2, 3,
@@ -78,9 +71,27 @@ export default class Cube extends Model {
     22, 20, 23
   ];
 
-
-  get shaders() {
-    return [this.vertShader, this.fragShader];
+  init() {
+    const { gl } = this;
+    this.identityMatrix = new Float32Array(16);
+    this.worldMatrix = new Float32Array(16);
+    this.viewMatrix = new Float32Array(16);
+    this.projMatrix = new Float32Array(16);
+    this.mWorldLocation = gl.getUniformLocation(this.program, 'mWorld');
+    this.mViewLocation = gl.getUniformLocation(this.program, 'mView');
+    this.mProjLocation = gl.getUniformLocation(this.program, 'mProj');
+    mat4.identity(this.identityMatrix);
+    mat4.identity(this.worldMatrix);
+    mat4.identity(this.projMatrix);
+    mat4.perspective(
+      this.projMatrix,
+      glMatrix.toRadian(45),
+      gl.canvas.width / gl.canvas.height,
+      0.1,
+      1000.0,
+    );
+    this.createBuffers();
+    this.createTextures();
   }
 
   createShaders() {
@@ -89,16 +100,20 @@ export default class Cube extends Model {
     this.fragShader = this.createShader(gl.FRAGMENT_SHADER, fragShaderSrc);
   }
 
-  prepare() {
+  get shaders() {
+    return [this.vertShader, this.fragShader];
+  }
+
+  createBuffers() {
     const { gl } = this;
     this.vertexBuffer = gl.createBuffer();
     this.indexBuffer = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(Cube.vertices), gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(Cube.indices), gl.STATIC_DRAW);
 
     const vertPositionLocation = gl.getAttribLocation(this.program, 'vertPosition');
     gl.vertexAttribPointer(
@@ -122,7 +137,10 @@ export default class Cube extends Model {
 
     gl.enableVertexAttribArray(vertPositionLocation);
     gl.enableVertexAttribArray(vertTexCoordLocation);
+  }
 
+  createTextures() {
+    const { gl } = this;
     this.boxTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.boxTexture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -131,30 +149,6 @@ export default class Cube extends Model {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, document.getElementById('crate'))
     gl.bindTexture(gl.TEXTURE_2D, null);
-
-    this.mWorldLocation = gl.getUniformLocation(this.program, 'mWorld');
-    this.mViewLocation = gl.getUniformLocation(this.program, 'mView');
-    const mProjLocation = gl.getUniformLocation(this.program, 'mProj');
-
-    this.worldMatrix = new Float32Array(16);
-    this.xRotationMatrix = new Float32Array(16);
-    this.yRotationMatrix = new Float32Array(16);
-    this.viewMatrix = new Float32Array(16);
-    const projMatrix = new Float32Array(16);
-
-    mat4.identity(this.xRotationMatrix);
-    mat4.identity(this.yRotationMatrix);
-    mat4.identity(this.worldMatrix);
-    mat4.perspective(
-      projMatrix,
-      glMatrix.toRadian(45),
-      gl.canvas.width / gl.canvas.height,
-      0.1,
-      1000.0,
-    );
-
-    gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
-    gl.uniformMatrix4fv(mProjLocation, gl.FALSE, projMatrix);
   }
 
   draw() {
@@ -171,10 +165,13 @@ export default class Cube extends Model {
       [0, 1, 0],
     );
 
+    gl.useProgram(this.program);
     gl.bindTexture(gl.TEXTURE_2D, this.boxTexture);
     gl.activeTexture(gl.TEXTURE0);
 
+    gl.uniformMatrix4fv(this.mWorldLocation, gl.FALSE, this.worldMatrix);
     gl.uniformMatrix4fv(this.mViewLocation, gl.FALSE, this.viewMatrix);
-    gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+    gl.uniformMatrix4fv(this.mProjLocation, gl.FALSE, this.projMatrix);
+    gl.drawElements(gl.TRIANGLES, Cube.indices.length, gl.UNSIGNED_SHORT, 0);
   }
 }

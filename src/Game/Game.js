@@ -13,10 +13,9 @@ export default class Game {
     gl.enable(gl.CULL_FACE);
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
-    const triangle = new Cube(gl);
-    this.addModel(triangle);
 
-    this.createProgram();
+    this.addModel(new Cube(gl));
+
     this.start();
   }
 
@@ -32,36 +31,5 @@ export default class Game {
 
   addModel(model) {
     this.models.push(model);
-  }
-
-  get shaders() {
-    const { models } = this;
-    const _shaders = [];
-
-    for (let i = 0; i < models.length; i++) {
-      for (let j = 0, shaders = models[i].shaders; j < shaders.length; j++) {
-        _shaders.push(shaders[j]);
-      }
-    }
-
-    return _shaders;
-  }
-
-  createProgram() {
-    const { gl, shaders, models } = this;
-    const program = gl.createProgram();
-
-    for (let i = 0; i < shaders.length; i++) {
-      gl.attachShader(program, shaders[i]);
-    }
-
-    gl.linkProgram(program);
-    gl.useProgram(program);
-
-    for (let i = 0; i < models.length; i++) {
-      models[i].attachProgram(program);
-    }
-
-    return program;
   }
 }
