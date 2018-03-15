@@ -5,9 +5,9 @@ varying vec3 fragNormal;
 uniform sampler2D sampler;
 
 void main() {
-  vec3 ambientLightIntensity = vec3(0.1, 0.1, 0.2);
+  vec3 ambientLightIntensity = vec3(0.4, 0.4, 0.4);
   vec3 sunlightIntensity = vec3(0.9, 0.9, 0.9);
-  vec3 sunlightDirection = normalize(vec3(1.0, 4.0, -2.0));
+  vec3 sunlightDirection = normalize(vec3(5.0, -5.0, -2.0));
   vec4 texel = texture2D(sampler, fragTexCoord);
 
   vec3 lightIntensity = ambientLightIntensity + (
