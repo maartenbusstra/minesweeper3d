@@ -38,7 +38,7 @@ export default class Game {
     gl.frontFace(gl.CCW);
     gl.cullFace(gl.BACK);
 
-    this.addModel(new Cube(gl, {}));
+    this.addModel(new Cube(gl, { texture: this.crateTexture }));
     this.addModel(new Monkey(gl, { model: this.monkey, texture: this.monkeyTexture }));
 
     this.start();
@@ -47,6 +47,7 @@ export default class Game {
   async fetchResources() {
     this.monkey = await fetchJson('/monkey.json');
     this.monkeyTexture = await fetchImage('/monkey.png');
+    this.crateTexture = await fetchImage('/crate.jpg');
   }
 
   start() {
