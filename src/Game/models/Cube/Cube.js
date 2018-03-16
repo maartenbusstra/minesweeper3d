@@ -1,5 +1,5 @@
 /* eslint import/no-webpack-loader-syntax: off */
-import { mat4, glMatrix } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import Model from '../Model';
 import vertShaderSrc from '!raw-loader!./vertexShader.glsl';
 import fragShaderSrc from '!raw-loader!./fragmentShader.glsl';
