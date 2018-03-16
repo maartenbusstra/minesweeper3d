@@ -1,5 +1,5 @@
 /* eslint import/no-webpack-loader-syntax: off */
-import { mat4 } from 'gl-matrix';
+import { mat4, glMatrix } from 'gl-matrix';
 import Model from '../Model';
 import vertShaderSrc from '!raw-loader!./vertexShader.glsl';
 import fragShaderSrc from '!raw-loader!./fragmentShader.glsl';
@@ -18,6 +18,8 @@ export default class Monkey extends Model {
     mat4.identity(this.identityMatrix);
     this.worldMatrix = new Float32Array(16);
     mat4.identity(this.worldMatrix);
+    mat4.translate(this.worldMatrix, this.worldMatrix, [2, 0, 2]);
+    mat4.rotate(this.worldMatrix, this.worldMatrix, glMatrix.toRadian(90), [-1, 0, 0]);
 
     this.vertices = flatten(mesh.vertices);
     this.indices = flatten(mesh.faces);
